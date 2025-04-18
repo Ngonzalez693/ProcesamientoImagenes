@@ -12,6 +12,9 @@ function interfaz_Clima
     colorTextoG = 0;
     colorTextoB = 0;
 
+    manualMode = false; % Modo manual
+    temperatureAvg = 0; % Inicializar la temperatura
+
     %% Elementos Interfaz
 
     % INTERFAZ
@@ -20,7 +23,7 @@ function interfaz_Clima
              
     % BOTÓN cargar imagen
     uicontrol('Style', 'pushbutton', 'String', 'Cargar Imagen', ...
-              'FontSize', 10, 'Position', [35 560 100 20], ...
+              'FontSize', 10, 'Position', [35 570 100 20], ...
               'Callback', @cargarImagen);
 
     % BOTÓN equalizar histograma
@@ -34,8 +37,8 @@ function interfaz_Clima
               'Callback', @actualizarClima);
 
     % TEXTBOX de Estación Metereológica
-    estMetText = uicontrol('Style', 'text', 'String', 'Ruido: -, Radiación Solar: -, Índice UV: -, Temperatura: -, Vel. del Viento: -, Dir. del Viento: -', ...
-                        'FontSize', 8, 'Position', [760 65 100 120]);
+    estMetText = uicontrol('Style', 'text', 'String', '', 'FontSize', 8, ...
+                           'Position', [750 65 120 120], 'HorizontalAlignment', 'center');
 
     % SLIDER umbral 1
     uicontrol('Style', 'text', 'String', 'Umbral 1', 'Position', [35 470 100 20]);
@@ -61,33 +64,38 @@ function interfaz_Clima
         'Position', [35 270 100 30], ...
         'Callback', @cambioOperador);
 
+    % Switch para modo manual
+     manualSwitch = uicontrol('Style', 'togglebutton', 'String', 'Modo Manual', ...
+                              'FontSize', 10, 'Position', [35 540 100 20], ...
+                              'Callback', @toggleManualMode);
+
     % Slider para tamaño de fuente
-    uicontrol('Style', 'text', 'String', 'Tamaño de Fuente:', 'Position', [35 240 100 20]);
-    tamanoFuenteSlider = uicontrol('Style', 'slider', 'Min', 8, 'Max', 100, 'Value', tamanoFuente, ...
-        'Position', [35 220 100 20], 'Callback', @actualizarTamanoFuente);
-    tamanoFuenteText = uicontrol('Style', 'text', 'String', num2str(tamanoFuente), 'Position', [140 220 30 20]);
+    uicontrol('Style', 'text', 'String', 'Tamaño de Fuente:', 'Position', [105 180 100 20]);
+    tamanoFuenteSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 100, 'Value', tamanoFuente, ...
+        'Position', [80 170 150 15], 'Callback', @actualizarTamanoFuente);
+    tamanoFuenteText = uicontrol('Style', 'text', 'String', num2str(tamanoFuente), 'Position', [235 165 30 20]);
     
     % Slider para color Rojo
-    uicontrol('Style', 'text', 'String', 'R:', 'Position', [35 200 20 20]);
+    uicontrol('Style', 'text', 'String', 'R:', 'Position', [60 135 20 20]);
     colorRSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoR, ...
-        'Position', [55 200 80 20], 'Callback', @actualizarColorR);
-    colorRText = uicontrol('Style', 'text', 'String', num2str(colorTextoR), 'Position', [140 200 30 20]);
+        'Position', [80 140 150 15], 'Callback', @actualizarColorR);
+    colorRText = uicontrol('Style', 'text', 'String', num2str(colorTextoR), 'Position', [235 135 30 20]);
     
     % Slider para color Verde
-    uicontrol('Style', 'text', 'String', 'G:', 'Position', [35 180 20 20]);
+    uicontrol('Style', 'text', 'String', 'G:', 'Position', [60 105 20 20]);
     colorGSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoG, ...
-        'Position', [55 180 80 20], 'Callback', @actualizarColorG);
-    colorGText = uicontrol('Style', 'text', 'String', num2str(colorTextoG), 'Position', [140 180 30 20]);
+        'Position', [80 110 150 15], 'Callback', @actualizarColorG);
+    colorGText = uicontrol('Style', 'text', 'String', num2str(colorTextoG), 'Position', [235 105 30 20]);
     
     % Slider para color Azul
-    uicontrol('Style', 'text', 'String', 'B:', 'Position', [35 160 20 20]);
+    uicontrol('Style', 'text', 'String', 'B:', 'Position', [60 75 20 20]);
     colorBSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoB, ...
-        'Position', [55 160 80 20], 'Callback', @actualizarColorB);
-    colorBText = uicontrol('Style', 'text', 'String', num2str(colorTextoB), 'Position', [140 160 30 20]);
+        'Position', [80 80 150 15], 'Callback', @actualizarColorB);
+    colorBText = uicontrol('Style', 'text', 'String', num2str(colorTextoB), 'Position', [235 75 30 20]);
     
     % Muestra de color resultante
     colorMuestra = uicontrol('Style', 'frame', 'BackgroundColor', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
-        'Position', [180 180 30 30]);
+        'Position', [270 90 55 55]);
 
     %% Posición de Imágenes
 
@@ -230,7 +238,7 @@ function interfaz_Clima
             windDirectionAvg = valores.wind.windDirectionAvg;
 
             % Mostrar info abajo en la interfaz
-            set(estMetText, 'String', sprintf('Ruido: %.2f, Radiación Solar: %.2f, Índice UV: %.2f, Temperatura: %.2f, Vel. del Viento: %.2f, Dir. del Viento: %.2f', ...
+            set(estMetText, 'String', sprintf('Ruido: %.2f\nRadiación Solar: %.2f\nÍndice UV: %.2f\nTemperatura: %.2f\nVel. del Viento: %.2f\nDir. del Viento: %.2f', ...
                         noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg));
             
             % Formatear el texto a mostrar
@@ -245,27 +253,24 @@ function interfaz_Clima
             % Mostrar el texto sobre la imagen original
             axes(ax1);
             hold on;
-            % El parámetro x=5 e y=size(img,1)-5 coloca el texto en la esquina inferior izquierda
-            % 'VerticalAlignment','bottom' alinea el texto desde abajo
             climaTexto = text(5, size(img,1)-5, textoClima, ...
-                'FontSize', tamanoFuente, ...
-                'Color', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
-                'VerticalAlignment', 'bottom', ...
-                'BackgroundColor', 'none');  % Sin fondo
-            hold off;
-            
-        catch
-            if ~isempty(climaTexto) && ishandle(climaTexto)
-                delete(climaTexto);
-            end
-            axes(ax1);
-            hold on;
-            climaTexto = text(5, size(img,1)-5, 'Error al leer la API', ...
                 'FontSize', tamanoFuente, ...
                 'Color', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
                 'VerticalAlignment', 'bottom', ...
                 'BackgroundColor', 'none');
             hold off;
+
+            % Ajustar sliders y operador de imagen según la temperatura
+            if ~manualMode
+                ajustarPorTemperatura(temperatureAvg);
+            end
+            
+        catch
+            if isempty(climaTexto) && ishandle(climaTexto)
+                delete(climaTexto);
+                set(estMetText, 'String', 'Error al leer la API');
+
+            end
         end
     end
 
@@ -374,5 +379,78 @@ function interfaz_Clima
         set(umbral2Text, 'String', num2str(val2));
         aplicarOperador();
     end
+
+    %% Funciones adicionales
+ 
+     % FUNCIÓN para el Switch de modo manual
+     function toggleManualMode(~, ~)
+        manualMode = get(manualSwitch, 'Value');
+  
+        % Activar o desactivar los sliders de color según el modo
+        if manualMode
+            set(colorRSlider, 'Enable', 'off');
+            set(colorGSlider, 'Enable', 'off');
+            set(colorBSlider, 'Enable', 'off');
+        else
+            set(colorRSlider, 'Enable', 'on');
+            set(colorGSlider, 'Enable', 'on');
+            set(colorBSlider, 'Enable', 'on');
+          
+        % Si se desactiva el modo manual, reajustar según la temperatura actual
+            actualizarClima();
+        end
+     end
+     
+     % FUNCIÓN para ajustar los sliders y el operador según la temperatura
+     function ajustarPorTemperatura(temperature)
+         if temperature > 24
+             % Opción 1: Amarillo intenso
+             set(colorRSlider, 'Value', 255);
+             set(colorGSlider, 'Value', 176);
+             set(colorBSlider, 'Value', 39);
+             actualizarColorR();
+             actualizarColorG();
+             actualizarColorB();
+              
+             set(operadorMenu, 'Value', 4); % Operador Extensión
+             cambioOperador();
+             set(umbral1Slider, 'Value', 255);
+             set(umbral2Slider, 'Value', 255);
+             actualizarUmbral1();
+             actualizarUmbral2();
+      
+         elseif temperature >= 20 && temperature <= 23
+             % Opción 2: Azul del cielo
+             set(colorRSlider, 'Value', 135);
+             set(colorGSlider, 'Value', 206);
+             set(colorBSlider, 'Value', 235);
+             actualizarColorR();
+             actualizarColorG();
+             actualizarColorB();
+              
+             set(operadorMenu, 'Value', 2); % Operador Int. Umbral
+             cambioOperador();
+             set(umbral1Slider, 'Value', 80);
+             set(umbral2Slider, 'Value', 120);
+             actualizarUmbral1();
+             actualizarUmbral2();
+      
+         else
+             % Opción 3: Gris frío
+             set(colorRSlider, 'Value', 130);
+             set(colorGSlider, 'Value', 161);
+             set(colorBSlider, 'Value', 177); 
+             actualizarColorR();
+             actualizarColorG();
+             actualizarColorB();
+              
+             set(operadorMenu, 'Value', 4); % Operador Extensión
+             cambioOperador();
+             set(umbral1Slider, 'Value', 0);
+             set(umbral2Slider, 'Value', 0);
+             actualizarUmbral1();
+             actualizarUmbral2();
+         end
+     end
 
 end

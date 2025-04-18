@@ -13,79 +13,46 @@ function interfaz
               'FontSize', 6, 'Position', [677 505 90 14], ...
               'Callback', @equalizarHistograma);
 
-     % BOTÓN obtener info de la Api
-     uicontrol('Style', 'pushbutton', 'String', 'Leer API', ...
-               'FontSize', 10, 'Position', [760 190 100 20], ...
-               'Callback', @actualizarClima);
+    % BOTÓN obtener info de la ISS
+    uicontrol('Style', 'pushbutton', 'String', 'Leer API', ...
+              'FontSize', 10, 'Position', [760 190 100 20], ...
+              'Callback', @actualizarUbicacionISS);
 
-     % TEXTBOX de Estación Metereológica
-     estMetText = uicontrol('Style', 'text', 'String', 'Ruido: -, Radiación Solar: -, Índice UV: -, Temperatura: -, Vel. del Viento: -, Dir. del Viento: -', ...
-                         'FontSize', 8, 'Position', [760 65 100 120]);
-
-     % FUNCIÓN para leer la API del clima de la USB
-     function actualizarClima(~, ~)
-         try
-             url = 'https://apioac22.cali.gov.co/metrics/range_public?deviceId=0703060003';
-             options = weboptions('ContentType', 'json', 'Timeout', 10);
-             data = webread(url, 'deviceId', '0703060003', options);
-             valores = data.values;
-        
-             noiseAvg = valores.noise.noiseAvg;
-             solarRadiationAvg = valores.surth.solarRadiationAvg;
-             uvIndexAvg = valores.surth.uvIndexAvg;
-             temperatureAvg = valores.surth.temperatureAvg;
-             windSpeedAvg = valores.wind.windSpeedAvg;
-             windDirectionAvg = valores.wind.windDirectionAvg;
-                
-             set(estMetText, 'String', sprintf('Ruido: %.2f, Radiación Solar: %.2f, Índice UV: %.2f, Temperatura: %.2f, Vel. del Viento: %.2f, Dir. del Viento: %.2f', ...
-                        noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg));
-                
-         catch
-            set(estMetText, 'String', 'Error al leer la API');
-         end
-     end
-
-
-    % % BOTÓN obtener info de la ISS
-    % uicontrol('Style', 'pushbutton', 'String', 'Leer API', ...
-    %           'FontSize', 10, 'Position', [760 190 100 20], ...
-    %           'Callback', @actualizarUbicacionISS);
-    % 
-    % % TEXTBOX de latitud y longitud
-    % issText = uicontrol('Style', 'text', 'String', 'Lat: -, Lon: -', ...
-    %                     'FontSize', 10, 'Position', [760 140 100 40]);
+    % TEXTBOX de latitud y longitud
+    issText = uicontrol('Style', 'text', 'String', 'Lat: -, Lon: -', ...
+                        'FontSize', 10, 'Position', [760 140 100 40]);
     
-    % % FUNCIÓN para leer API de ISS
-    % function actualizarUbicacionISS(~, ~)
-    %     try
-    %         data = webread('http://api.open-notify.org/iss-now.json');
-    %         lat = str2double(data.iss_position.latitude);
-    %         lon = str2double(data.iss_position.longitude);
-    %         set(issText, 'String', sprintf('Lat: %.2f, Lon: %.2f', lat, lon));
-    % 
-    %         % --- Ajustar umbrales solo si está sobre América del Norte o del Sur ---
-    %         if (lat >= -60 && lat <= 70) && (lon >= -170 && lon <= -30)
-    %             set(umbral1Slider, 'Value', 50);
-    %             set(umbral1Text, 'String', '50');
-    %             set(umbral2Slider, 'Value', 150);
-    %             set(umbral2Text, 'String', '150');
-    %             aplicarOperador();  % aplicar los cambios en la imagen procesada
-    %         end
-    % 
-    %         % --- Agregar marca de agua SIEMPRE al presionar el botón ---
-    %         if ~isempty(imgGray)
-    %             marca = sprintf('Lat: %.2f, Lon: %.2f', lat, lon);
-    %             axes(ax2); imshow(imgGray); title('Grises');
-    %             hold on;
-    %             text(10, 710, marca, 'Color', 'white', 'FontSize', 7, ...
-    %                  'FontWeight', 'bold','Margin', 1);
-    %             hold off;
-    %         end
-    % 
-    %     catch
-    %          set(issText, 'String', 'Error obteniendo datos');
-    %     end
-    % end
+    % FUNCIÓN para leer API de ISS
+    function actualizarUbicacionISS(~, ~)
+        try
+            data = webread('http://api.open-notify.org/iss-now.json');
+            lat = str2double(data.iss_position.latitude);
+            lon = str2double(data.iss_position.longitude);
+            set(issText, 'String', sprintf('Lat: %.2f, Lon: %.2f', lat, lon));
+
+            % --- Ajustar umbrales solo si está sobre América del Norte o del Sur ---
+            if (lat >= -60 && lat <= 70) && (lon >= -170 && lon <= -30)
+                set(umbral1Slider, 'Value', 50);
+                set(umbral1Text, 'String', '50');
+                set(umbral2Slider, 'Value', 150);
+                set(umbral2Text, 'String', '150');
+                aplicarOperador();  % aplicar los cambios en la imagen procesada
+            end
+
+            % --- Agregar marca de agua SIEMPRE al presionar el botón ---
+            if ~isempty(imgGray)
+                marca = sprintf('Lat: %.2f, Lon: %.2f', lat, lon);
+                axes(ax2); imshow(imgGray); title('Grises');
+                hold on;
+                text(10, 710, marca, 'Color', 'white', 'FontSize', 7, ...
+                     'FontWeight', 'bold','Margin', 1);
+                hold off;
+            end
+
+        catch
+             set(issText, 'String', 'Error obteniendo datos');
+        end
+    end
 
     % SLIDER umbral 1
     uicontrol('Style', 'text', 'String', 'Umbral 1', 'Position', [35 470 100 20]);

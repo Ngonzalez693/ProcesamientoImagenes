@@ -1,4 +1,19 @@
-function interfaz
+%% Interfaz Gráfica
+function interfaz_Clima
+
+    % Variables
+    img = [];
+    imgGray = []; % Imagen en escala de grises
+    climaTexto = []; % Referencia al objeto de texto del clima
+
+    % Variables para el formato del texto
+    tamanoFuente = 10;
+    colorTextoR = 0;
+    colorTextoG = 0;
+    colorTextoB = 0;
+
+    %% Elementos Interfaz
+
     % INTERFAZ
     hFig = figure('Name', 'Cargar Imagen', 'NumberTitle', 'off', ...
                  'Position', [100 100 900 650]);
@@ -13,37 +28,14 @@ function interfaz
               'FontSize', 6, 'Position', [677 505 90 14], ...
               'Callback', @equalizarHistograma);
 
-     % BOTÓN obtener info de la Api
-     uicontrol('Style', 'pushbutton', 'String', 'Leer API', ...
-               'FontSize', 10, 'Position', [760 190 100 20], ...
-               'Callback', @actualizarClima);
+    % BOTÓN obtener info de la Api
+    uicontrol('Style', 'pushbutton', 'String', 'Leer API', ...
+              'FontSize', 10, 'Position', [760 190 100 20], ...
+              'Callback', @actualizarClima);
 
-     % TEXTBOX de Estación Metereológica
-     estMetText = uicontrol('Style', 'text', 'String', 'Ruido: -, Radiación Solar: -, Índice UV: -, Temperatura: -, Vel. del Viento: -, Dir. del Viento: -', ...
-                         'FontSize', 8, 'Position', [760 65 100 120]);
-
-     % FUNCIÓN para leer la API del clima de la USB
-     function actualizarClima(~, ~)
-         try
-             url = 'https://apioac22.cali.gov.co/metrics/range_public?deviceId=0703060003';
-             options = weboptions('ContentType', 'json', 'Timeout', 10);
-             data = webread(url, 'deviceId', '0703060003', options);
-             valores = data.values;
-        
-             noiseAvg = valores.noise.noiseAvg;
-             solarRadiationAvg = valores.surth.solarRadiationAvg;
-             uvIndexAvg = valores.surth.uvIndexAvg;
-             temperatureAvg = valores.surth.temperatureAvg;
-             windSpeedAvg = valores.wind.windSpeedAvg;
-             windDirectionAvg = valores.wind.windDirectionAvg;
-                
-             set(estMetText, 'String', sprintf('Ruido: %.2f, Radiación Solar: %.2f, Índice UV: %.2f, Temperatura: %.2f, Vel. del Viento: %.2f, Dir. del Viento: %.2f', ...
-                        noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg));
-                
-         catch
-            set(estMetText, 'String', 'Error al leer la API');
-         end
-     end
+    % TEXTBOX de Estación Metereológica
+    estMetText = uicontrol('Style', 'text', 'String', 'Ruido: -, Radiación Solar: -, Índice UV: -, Temperatura: -, Vel. del Viento: -, Dir. del Viento: -', ...
+                        'FontSize', 8, 'Position', [760 65 100 120]);
 
     % SLIDER umbral 1
     uicontrol('Style', 'text', 'String', 'Umbral 1', 'Position', [35 470 100 20]);
@@ -68,6 +60,36 @@ function interfaz
         'String', {'Operador Umbral', 'Operador Int. Umbral', 'Operador Int. Umbral Gris', 'Operador Extensión'}, ...
         'Position', [35 270 100 30], ...
         'Callback', @cambioOperador);
+
+    % Slider para tamaño de fuente
+    uicontrol('Style', 'text', 'String', 'Tamaño de Fuente:', 'Position', [35 240 100 20]);
+    tamanoFuenteSlider = uicontrol('Style', 'slider', 'Min', 8, 'Max', 100, 'Value', tamanoFuente, ...
+        'Position', [35 220 100 20], 'Callback', @actualizarTamanoFuente);
+    tamanoFuenteText = uicontrol('Style', 'text', 'String', num2str(tamanoFuente), 'Position', [140 220 30 20]);
+    
+    % Slider para color Rojo
+    uicontrol('Style', 'text', 'String', 'R:', 'Position', [35 200 20 20]);
+    colorRSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoR, ...
+        'Position', [55 200 80 20], 'Callback', @actualizarColorR);
+    colorRText = uicontrol('Style', 'text', 'String', num2str(colorTextoR), 'Position', [140 200 30 20]);
+    
+    % Slider para color Verde
+    uicontrol('Style', 'text', 'String', 'G:', 'Position', [35 180 20 20]);
+    colorGSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoG, ...
+        'Position', [55 180 80 20], 'Callback', @actualizarColorG);
+    colorGText = uicontrol('Style', 'text', 'String', num2str(colorTextoG), 'Position', [140 180 30 20]);
+    
+    % Slider para color Azul
+    uicontrol('Style', 'text', 'String', 'B:', 'Position', [35 160 20 20]);
+    colorBSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoB, ...
+        'Position', [55 160 80 20], 'Callback', @actualizarColorB);
+    colorBText = uicontrol('Style', 'text', 'String', num2str(colorTextoB), 'Position', [140 160 30 20]);
+    
+    % Muestra de color resultante
+    colorMuestra = uicontrol('Style', 'frame', 'BackgroundColor', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
+        'Position', [180 180 30 30]);
+
+    %% Posición de Imágenes
 
     % POSICIÓN de las imágenes
     ax1 = axes('Parent', hFig, 'Position', [0.25 0.8 0.3 0.15]); % Imagen original (col 2-3, fila 1)
@@ -102,10 +124,10 @@ function interfaz
 
     ax11 = axes('Parent', hFig, 'Position', [0.4 0.1 0.4 0.20]); % Imagen Procesada
     title(ax11, 'Imagen Procesada');
-    
-    img = [];
-    imgGray = []; % Imagen en escala de grises
+
     cambioOperador(); % Forzar ejecución inicial de configuración del operador
+
+    %% Funciones cargar Imágenes
     
     % FUNCIÓN para cargar la imagen
     function cargarImagen(~, ~)
@@ -165,8 +187,15 @@ function interfaz
         axes(ax9);
         histogram(img(:, :, 3), 'FaceColor', 'b', 'EdgeColor', 'b');
         title('Histograma Azul');
+
+        % Si había datos de clima, actualizar el texto sobre la imagen
+        if ~isempty(climaTexto) && ishandle(climaTexto)
+            delete(climaTexto);
+            actualizarClima();
+        end
+
     end
-    
+
     % FUNCIÓN para equalizar el histograma
     function equalizarHistograma(~, ~)
         if isempty(imgGray)
@@ -179,6 +208,103 @@ function interfaz
         imshow(imgEq);
         title('Imagen Equalizada');
     end
+
+    %% Funciones API Clima
+    function actualizarClima(~, ~)
+        try
+            % Verificar si la imagen está cargada
+            if isempty(img)
+                return;
+            end
+            
+            url = 'https://apioac22.cali.gov.co/metrics/range_public?deviceId=0703060003';
+            options = weboptions('ContentType', 'json', 'Timeout', 10);
+            data = webread(url, 'deviceId', '0703060003', options);
+            valores = data.values;
+            
+            noiseAvg = valores.noise.noiseAvg;
+            solarRadiationAvg = valores.surth.solarRadiationAvg;
+            uvIndexAvg = valores.surth.uvIndexAvg;
+            temperatureAvg = valores.surth.temperatureAvg;
+            windSpeedAvg = valores.wind.windSpeedAvg;
+            windDirectionAvg = valores.wind.windDirectionAvg;
+
+            % Mostrar info abajo en la interfaz
+            set(estMetText, 'String', sprintf('Ruido: %.2f, Radiación Solar: %.2f, Índice UV: %.2f, Temperatura: %.2f, Vel. del Viento: %.2f, Dir. del Viento: %.2f', ...
+                        noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg));
+            
+            % Formatear el texto a mostrar
+            textoClima = sprintf('Ruido: %.2f\nRadiación Solar: %.2f\nÍndice UV: %.2f\nTemperatura: %.2f\nVel. del Viento: %.2f\nDir. del Viento: %.2f', ...
+                noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg);
+            
+            % Eliminar el texto anterior si existe
+            if ~isempty(climaTexto) && ishandle(climaTexto)
+                delete(climaTexto);
+            end
+            
+            % Mostrar el texto sobre la imagen original
+            axes(ax1);
+            hold on;
+            % El parámetro x=5 e y=size(img,1)-5 coloca el texto en la esquina inferior izquierda
+            % 'VerticalAlignment','bottom' alinea el texto desde abajo
+            climaTexto = text(5, size(img,1)-5, textoClima, ...
+                'FontSize', tamanoFuente, ...
+                'Color', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
+                'VerticalAlignment', 'bottom', ...
+                'BackgroundColor', 'none');  % Sin fondo
+            hold off;
+            
+        catch
+            if ~isempty(climaTexto) && ishandle(climaTexto)
+                delete(climaTexto);
+            end
+            axes(ax1);
+            hold on;
+            climaTexto = text(5, size(img,1)-5, 'Error al leer la API', ...
+                'FontSize', tamanoFuente, ...
+                'Color', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
+                'VerticalAlignment', 'bottom', ...
+                'BackgroundColor', 'none');
+            hold off;
+        end
+    end
+
+     %% Funciones para sliders de formato de texto
+    
+    function actualizarTamanoFuente(~, ~)
+        tamanoFuente = round(get(tamanoFuenteSlider, 'Value'));
+        set(tamanoFuenteText, 'String', num2str(tamanoFuente));
+        actualizarFormatoTexto();
+    end
+    
+    function actualizarColorR(~, ~)
+        colorTextoR = round(get(colorRSlider, 'Value'));
+        set(colorRText, 'String', num2str(colorTextoR));
+        set(colorMuestra, 'BackgroundColor', [colorTextoR/255, colorTextoG/255, colorTextoB/255]);
+        actualizarFormatoTexto();
+    end
+    
+    function actualizarColorG(~, ~)
+        colorTextoG = round(get(colorGSlider, 'Value'));
+        set(colorGText, 'String', num2str(colorTextoG));
+        set(colorMuestra, 'BackgroundColor', [colorTextoR/255, colorTextoG/255, colorTextoB/255]);
+        actualizarFormatoTexto();
+    end
+    
+    function actualizarColorB(~, ~)
+        colorTextoB = round(get(colorBSlider, 'Value'));
+        set(colorBText, 'String', num2str(colorTextoB));
+        set(colorMuestra, 'BackgroundColor', [colorTextoR/255, colorTextoG/255, colorTextoB/255]);
+        actualizarFormatoTexto();
+    end
+    
+    function actualizarFormatoTexto()
+        if ~isempty(climaTexto) && ishandle(climaTexto)
+            set(climaTexto, 'FontSize', tamanoFuente, 'Color', [colorTextoR/255, colorTextoG/255, colorTextoB/255]);
+        end
+    end
+
+    %% Funciones Operadores
 
     % FUNCIÓN para aplicar los operadores
     function aplicarOperador(~, ~)

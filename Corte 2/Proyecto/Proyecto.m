@@ -38,7 +38,7 @@ function interfaz_Clima
 
     % TEXTBOX de Estación Metereológica
     estMetText = uicontrol('Style', 'text', 'String', '', 'FontSize', 8, ...
-                           'Position', [750 65 120 120], 'HorizontalAlignment', 'center');
+                           'Position', [750 65 120 120]);
 
     % SLIDER umbral 1
     uicontrol('Style', 'text', 'String', 'Umbral 1', 'Position', [35 470 100 20]);
@@ -66,8 +66,9 @@ function interfaz_Clima
 
     % Switch para modo manual
      manualSwitch = uicontrol('Style', 'togglebutton', 'String', 'Modo Manual', ...
-                              'FontSize', 10, 'Position', [35 540 100 20], ...
-                              'Callback', @toggleManualMode);
+                              'FontSize', 8, 'Position', [35 540 100 20], ...
+                              'Callback', @toggleManualMode, ...
+                              'Value', manualMode);
 
     % Slider para tamaño de fuente
     uicontrol('Style', 'text', 'String', 'Tamaño de Fuente:', 'Position', [105 180 100 20]);
@@ -134,6 +135,7 @@ function interfaz_Clima
     title(ax11, 'Imagen Procesada');
 
     cambioOperador(); % Forzar ejecución inicial de configuración del operador
+    toggleManualMode(); % Forzar primera actualización del estado
 
     %% Funciones cargar Imágenes
     
@@ -237,14 +239,13 @@ function interfaz_Clima
             windSpeedAvg = valores.wind.windSpeedAvg;
             windDirectionAvg = valores.wind.windDirectionAvg;
 
-            % Mostrar info abajo en la interfaz
-            set(estMetText, 'String', sprintf('Ruido: %.2f\nRadiación Solar: %.2f\nÍndice UV: %.2f\nTemperatura: %.2f\nVel. del Viento: %.2f\nDir. del Viento: %.2f', ...
-                        noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg));
-            
             % Formatear el texto a mostrar
             textoClima = sprintf('Ruido: %.2f\nRadiación Solar: %.2f\nÍndice UV: %.2f\nTemperatura: %.2f\nVel. del Viento: %.2f\nDir. del Viento: %.2f', ...
                 noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg);
             
+            % Mostrar info abajo en la interfaz
+            set(estMetText, 'String', textoClima);
+
             % Eliminar el texto anterior si existe
             if ~isempty(climaTexto) && ishandle(climaTexto)
                 delete(climaTexto);
@@ -260,7 +261,7 @@ function interfaz_Clima
                 'BackgroundColor', 'none');
             hold off;
 
-            % Ajustar sliders y operador de imagen según la temperatura
+            % Ajustar sliders según la temperatura, solo ajustar si NO está en modo manual
             if ~manualMode
                 ajustarPorTemperatura(temperatureAvg);
             end
@@ -383,23 +384,28 @@ function interfaz_Clima
     %% Funciones adicionales
  
      % FUNCIÓN para el Switch de modo manual
-     function toggleManualMode(~, ~)
+    function toggleManualMode(~, ~)
         manualMode = get(manualSwitch, 'Value');
-  
-        % Activar o desactivar los sliders de color según el modo
+        
+        % Actualizar etiqueta del botón
         if manualMode
-            set(colorRSlider, 'Enable', 'off');
-            set(colorGSlider, 'Enable', 'off');
-            set(colorBSlider, 'Enable', 'off');
+            set(manualSwitch, 'String', 'Modo Automático');
         else
+            set(manualSwitch, 'String', 'Modo Manual');
+        end
+        
+        if manualMode
             set(colorRSlider, 'Enable', 'on');
             set(colorGSlider, 'Enable', 'on');
             set(colorBSlider, 'Enable', 'on');
-          
-        % Si se desactiva el modo manual, reajustar según la temperatura actual
+        else
+            set(colorRSlider, 'Enable', 'off');
+            set(colorGSlider, 'Enable', 'off');
+            set(colorBSlider, 'Enable', 'off');
             actualizarClima();
         end
-     end
+    end
+
      
      % FUNCIÓN para ajustar los sliders y el operador según la temperatura
      function ajustarPorTemperatura(temperature)
@@ -414,8 +420,8 @@ function interfaz_Clima
               
              set(operadorMenu, 'Value', 4); % Operador Extensión
              cambioOperador();
-             set(umbral1Slider, 'Value', 255);
-             set(umbral2Slider, 'Value', 255);
+             set(umbral1Slider, 'Value', 0);
+             set(umbral2Slider, 'Value', 1);
              actualizarUmbral1();
              actualizarUmbral2();
       
@@ -428,7 +434,7 @@ function interfaz_Clima
              actualizarColorG();
              actualizarColorB();
               
-             set(operadorMenu, 'Value', 2); % Operador Int. Umbral
+             set(operadorMenu, 'Value', 4); % Operador Extensión
              cambioOperador();
              set(umbral1Slider, 'Value', 80);
              set(umbral2Slider, 'Value', 120);
@@ -446,8 +452,8 @@ function interfaz_Clima
               
              set(operadorMenu, 'Value', 4); % Operador Extensión
              cambioOperador();
-             set(umbral1Slider, 'Value', 0);
-             set(umbral2Slider, 'Value', 0);
+             set(umbral1Slider, 'Value', 254);
+             set(umbral2Slider, 'Value', 255);
              actualizarUmbral1();
              actualizarUmbral2();
          end

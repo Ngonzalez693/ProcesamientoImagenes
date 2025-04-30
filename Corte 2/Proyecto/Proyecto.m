@@ -7,7 +7,7 @@ function interfaz_Clima
     climaTexto = []; % Referencia al objeto de texto del clima
 
     % Variables para el formato del texto
-    tamanoFuente = 10;
+    tamanoFuente = 4;
     colorTextoR = 0;
     colorTextoG = 0;
     colorTextoB = 0;
@@ -18,126 +18,131 @@ function interfaz_Clima
     %% Elementos Interfaz
 
     % INTERFAZ
-    hFig = figure('Name', 'Cargar Imagen', 'NumberTitle', 'off', ...
-                 'Position', [100 100 900 650]);
+    hFig = figure('Name', 'Interfaz', 'NumberTitle', 'off', ...
+                 'Position', [100 100 1200 650]);
              
     % BOTÓN cargar imagen
     uicontrol('Style', 'pushbutton', 'String', 'Cargar Imagen', ...
-              'FontSize', 10, 'Position', [35 570 100 20], ...
+              'FontSize', 10, 'Position', [85 560 100 20], ...
               'Callback', @cargarImagen);
+
+    % Switch para modo manual
+    manualSwitch = uicontrol('Style', 'togglebutton', 'String', 'Modo Manual', ...
+                              'FontSize', 8, 'Position', [85 530 100 20], ...
+                              'Callback', @toggleManualMode, ...
+                              'Value', manualMode);
+
+    % BOTÓN descargar imagen
+    uicontrol('Style', 'pushbutton', 'String', 'Descargar Imagen', ...
+              'FontSize', 8, 'Position', [85 500 100 20], ...
+              'Callback', @descargarImagen);
 
     % BOTÓN equalizar histograma
     uicontrol('Style', 'pushbutton', 'String', 'Equalizar Histograma', ...
-              'FontSize', 6, 'Position', [677 505 90 14], ...
+              'FontSize', 6, 'Position', [912 435 100 14], ...
               'Callback', @equalizarHistograma);
 
     % BOTÓN obtener info de la Api
     uicontrol('Style', 'pushbutton', 'String', 'Leer API', ...
-              'FontSize', 10, 'Position', [760 190 100 20], ...
+              'FontSize', 10, 'Position', [1030 130 100 20], ...
               'Callback', @actualizarClima);
 
     % TEXTBOX de Estación Metereológica
     estMetText = uicontrol('Style', 'text', 'String', '', 'FontSize', 8, ...
-                           'Position', [750 65 120 120]);
+                           'Position', [1020 5 120 120]);
 
     % SLIDER umbral 1
-    uicontrol('Style', 'text', 'String', 'Umbral 1', 'Position', [35 470 100 20]);
+    uicontrol('Style', 'text', 'String', 'Umbral 1', 'Position', [85 420 100 20]);
     umbral1Slider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', 0, ...
-        'Position', [35 450 100 20], 'Callback', @actualizarUmbral1);
-    umbral1Text = uicontrol('Style', 'text', 'String', '0', 'Position', [140 450 30 20]);
+        'Position', [85 400 100 20], 'Callback', @actualizarUmbral1);
+    umbral1Text = uicontrol('Style', 'text', 'String', '0', 'Position', [190 397 30 20]);
 
     % SLIDER umbral 2
-    uicontrol('Style', 'text', 'String', 'Umbral 2', 'Position', [35 420 100 20]);
+    uicontrol('Style', 'text', 'String', 'Umbral 2', 'Position', [85 370 100 20]);
     umbral2Slider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', 255, ...
-        'Position', [35 400 100 20], 'Callback', @actualizarUmbral2);
-    umbral2Text = uicontrol('Style', 'text', 'String', '255', 'Position', [140 400 30 20]);
+        'Position', [85 350 100 20], 'Callback', @actualizarUmbral2);
+    umbral2Text = uicontrol('Style', 'text', 'String', '255', 'Position', [190 347 30 20]);
 
     % TEXTO de mensaje de validación
     mensajeText = uicontrol('Style', 'text', 'String', '', ...
         'FontSize', 9, 'ForegroundColor', 'red', ...
-        'Position', [30 355 130 40], 'HorizontalAlignment', 'center');
+        'Position', [80 305 130 40], 'HorizontalAlignment', 'center');
     
     % MENÚ DESPLEGABLE
-    uicontrol('Style', 'text', 'String', 'Seleccionar Operador:', 'Position', [35 310 100 25]);
+    uicontrol('Style', 'text', 'String', 'Seleccionar Operador:', 'Position', [85 260 100 25]);
     operadorMenu = uicontrol('Style', 'popupmenu', ...
         'String', {'Operador Umbral', 'Operador Int. Umbral', 'Operador Int. Umbral Gris', 'Operador Extensión'}, ...
-        'Position', [35 270 100 30], ...
+        'Position', [85 220 100 30], ...
         'Callback', @cambioOperador);
 
-    % Switch para modo manual
-     manualSwitch = uicontrol('Style', 'togglebutton', 'String', 'Modo Manual', ...
-                              'FontSize', 8, 'Position', [35 540 100 20], ...
-                              'Callback', @toggleManualMode, ...
-                              'Value', manualMode);
-
     % Slider para tamaño de fuente
-    uicontrol('Style', 'text', 'String', 'Tamaño de Fuente:', 'Position', [105 180 100 20]);
+    uicontrol('Style', 'text', 'String', 'Tamaño de Fuente:', 'Position', [105 130 100 20]);
     tamanoFuenteSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 100, 'Value', tamanoFuente, ...
-        'Position', [80 170 150 15], 'Callback', @actualizarTamanoFuente);
-    tamanoFuenteText = uicontrol('Style', 'text', 'String', num2str(tamanoFuente), 'Position', [235 165 30 20]);
+        'Position', [80 120 150 15], 'Callback', @actualizarTamanoFuente);
+    tamanoFuenteText = uicontrol('Style', 'text', 'String', num2str(tamanoFuente), 'Position', [235 115 30 20]);
     
     % Slider para color Rojo
-    uicontrol('Style', 'text', 'String', 'R:', 'Position', [60 135 20 20]);
+    uicontrol('Style', 'text', 'String', 'R:', 'Position', [60 85 20 20]);
     colorRSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoR, ...
-        'Position', [80 140 150 15], 'Callback', @actualizarColorR);
-    colorRText = uicontrol('Style', 'text', 'String', num2str(colorTextoR), 'Position', [235 135 30 20]);
+        'Position', [80 90 150 15], 'Callback', @actualizarColorR);
+    colorRText = uicontrol('Style', 'text', 'String', num2str(colorTextoR), 'Position', [235 85 30 20]);
     
     % Slider para color Verde
-    uicontrol('Style', 'text', 'String', 'G:', 'Position', [60 105 20 20]);
+    uicontrol('Style', 'text', 'String', 'G:', 'Position', [60 55 20 20]);
     colorGSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoG, ...
-        'Position', [80 110 150 15], 'Callback', @actualizarColorG);
-    colorGText = uicontrol('Style', 'text', 'String', num2str(colorTextoG), 'Position', [235 105 30 20]);
+        'Position', [80 60 150 15], 'Callback', @actualizarColorG);
+    colorGText = uicontrol('Style', 'text', 'String', num2str(colorTextoG), 'Position', [235 55 30 20]);
     
     % Slider para color Azul
-    uicontrol('Style', 'text', 'String', 'B:', 'Position', [60 75 20 20]);
+    uicontrol('Style', 'text', 'String', 'B:', 'Position', [60 25 20 20]);
     colorBSlider = uicontrol('Style', 'slider', 'Min', 0, 'Max', 255, 'Value', colorTextoB, ...
-        'Position', [80 80 150 15], 'Callback', @actualizarColorB);
-    colorBText = uicontrol('Style', 'text', 'String', num2str(colorTextoB), 'Position', [235 75 30 20]);
+        'Position', [80 30 150 15], 'Callback', @actualizarColorB);
+    colorBText = uicontrol('Style', 'text', 'String', num2str(colorTextoB), 'Position', [235 25 30 20]);
     
     % Muestra de color resultante
     colorMuestra = uicontrol('Style', 'frame', 'BackgroundColor', [colorTextoR/255, colorTextoG/255, colorTextoB/255], ...
-        'Position', [270 90 55 55]);
+        'Position', [270 40 55 55]);
 
     %% Posición de Imágenes
 
     % POSICIÓN de las imágenes
-    ax1 = axes('Parent', hFig, 'Position', [0.25 0.8 0.3 0.15]); % Imagen original (col 2-3, fila 1)
+    ax1 = axes('Parent', hFig, 'Position', [0.225 0.7 0.35 0.25]); % Imagen original (col 2-3, fila 1)
     title(ax1, 'Imagen Original');
     
-    ax2 = axes('Parent', hFig, 'Position', [0.225 0.6 0.15 0.15]); % Imagen en escala de grises (col 2, fila 2)
+    ax2 = axes('Parent', hFig, 'Position', [0.225 0.5 0.15 0.15]); % Imagen en escala de grises (col 2, fila 2)
     title(ax2, 'Escala de Grises');
     
-    ax3 = axes('Parent', hFig, 'Position', [0.425 0.6 0.15 0.15]); % Canal Rojo (col 3, fila 2)
+    ax3 = axes('Parent', hFig, 'Position', [0.425 0.5 0.15 0.15]); % Canal Rojo (col 3, fila 2)
     title(ax3, 'Canal Rojo');
     
-    ax4 = axes('Parent', hFig, 'Position', [0.625 0.6 0.15 0.15]); % Canal Verde (col 4, fila 2)
+    ax4 = axes('Parent', hFig, 'Position', [0.625 0.5 0.15 0.15]); % Canal Verde (col 4, fila 2)
     title(ax4, 'Canal Verde');
     
-    ax5 = axes('Parent', hFig, 'Position', [0.825 0.6 0.15 0.15]); % Canal Azul (col 5, fila 2)
+    ax5 = axes('Parent', hFig, 'Position', [0.825 0.5 0.15 0.15]); % Canal Azul (col 5, fila 2)
     title(ax5, 'Canal Azul');
     
-    ax6 = axes('Parent', hFig, 'Position', [0.225 0.4 0.15 0.15]); % Histograma Escala de Grises
+    ax6 = axes('Parent', hFig, 'Position', [0.225 0.3 0.15 0.15]); % Histograma Escala de Grises
     title(ax6, 'Histograma Escala de Grises');
     
-    ax7 = axes('Parent', hFig, 'Position', [0.425 0.4 0.15 0.15]); % Histograma Rojo
+    ax7 = axes('Parent', hFig, 'Position', [0.425 0.3 0.15 0.15]); % Histograma Rojo
     title(ax7, 'Histograma Rojo');
     
-    ax8 = axes('Parent', hFig, 'Position', [0.625 0.4 0.15 0.15]); % Histograma Verde
+    ax8 = axes('Parent', hFig, 'Position', [0.625 0.3 0.15 0.15]); % Histograma Verde
     title(ax8, 'Histograma Verde');
     
-    ax9 = axes('Parent', hFig, 'Position', [0.825 0.4 0.15 0.15]); % Histograma Azul
+    ax9 = axes('Parent', hFig, 'Position', [0.825 0.3 0.15 0.15]); % Histograma Azul
     title(ax9, 'Histograma Azul');
     
-    ax10 = axes('Parent', hFig, 'Position', [0.65 0.8 0.3 0.15]); % Imagen Equalizada (col 4-5, fila 1)
+    ax10 = axes('Parent', hFig, 'Position', [0.625 0.7 0.35 0.25]); % Imagen Equalizada (col 4-5, fila 1)
     title(ax10, 'Imagen Equalizada');
 
-    ax11 = axes('Parent', hFig, 'Position', [0.4 0.1 0.4 0.20]); % Imagen Procesada
+    ax11 = axes('Parent', hFig, 'Position', [0.4 0.03 0.4 0.20]); % Imagen Procesada
     title(ax11, 'Imagen Procesada');
 
     cambioOperador(); % Forzar ejecución inicial de configuración del operador
     toggleManualMode(); % Forzar primera actualización del estado
 
-    %% Funciones cargar Imágenes
+    %% Funciones Imágenes
     
     % FUNCIÓN para cargar la imagen
     function cargarImagen(~, ~)
@@ -206,6 +211,43 @@ function interfaz_Clima
 
     end
 
+    % FUNCIÓN descargar imagen
+    function descargarImagen(~, ~)
+        % Verifica si la imagen original (img) existe y si la función actualizarClima ha sido ejecutada
+        if ~isempty(img) && ~isempty(climaTexto)
+            % Crear una copia de la imagen original
+            imgFinal = img;
+            
+            % Obtener el texto del clima
+            textoInfo = get(climaTexto, 'String');
+            colorTexto = [colorTextoR/255, colorTextoG/255, colorTextoB/255];
+            
+            % Crear una figura temporal fuera de pantalla
+            tempFig = figure('Visible', 'off');
+            imshow(imgFinal);
+            hold on;
+            text(5, size(imgFinal,1)-5, textoInfo, ...
+                'FontSize', tamanoFuente*2, ... % Aumentar el tamaño de la fuente
+                'Color', colorTexto, ...
+                'VerticalAlignment', 'bottom');
+            hold off;
+            
+            % Capturar la imagen con el texto
+            frame = getframe(gca);
+            imgConTexto = frame.cdata;
+            close(tempFig);
+            
+            % Abre un cuadro de diálogo para que el usuario elija dónde guardar la imagen
+            [file, path] = uiputfile({'*.png';'*.jpg';'*.bmp'}, 'Guardar Imagen con Info', 'imagen_con_info.jpg');
+            
+            % Verifica si se seleccionó un archivo y una ruta
+            if ~isequal(file, 0)
+                imwrite(imgConTexto, fullfile(path, file));
+            end
+        end
+    end
+
+
     % FUNCIÓN para equalizar el histograma
     function equalizarHistograma(~, ~)
         if isempty(imgGray)
@@ -236,15 +278,20 @@ function interfaz_Clima
             solarRadiationAvg = valores.surth.solarRadiationAvg;
             uvIndexAvg = valores.surth.uvIndexAvg;
             temperatureAvg = valores.surth.temperatureAvg;
+            humidityAvg = valores.surth.humidityAvg;
             windSpeedAvg = valores.wind.windSpeedAvg;
             windDirectionAvg = valores.wind.windDirectionAvg;
 
-            % Formatear el texto a mostrar
-            textoClima = sprintf('Ruido: %.2f\nRadiación Solar: %.2f\nÍndice UV: %.2f\nTemperatura: %.2f\nVel. del Viento: %.2f\nDir. del Viento: %.2f', ...
-                noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, windSpeedAvg, windDirectionAvg);
+            % Formato del texto a en la imagen
+            textoClima = sprintf('Ruido: %.2f, Radiación Solar: %.2f, \nÍndice UV: %.2f, Temperatura: %.2f, \nHumidity: %.2f, Vel. del Viento: %.2f, \nDir. del Viento: %.2f', ...
+                noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, humidityAvg, windSpeedAvg, windDirectionAvg);
             
+            % Formato del texto en interfaz
+            textoIntClima = sprintf('Ruido: %.2f\nRadiación Solar: %.2f\nÍndice UV: %.2f\nTemperatura: %.2f\nHumidity: %.2f\nVel. del Viento: %.2f\nDir. del Viento: %.2f', ...
+                noiseAvg, solarRadiationAvg, uvIndexAvg, temperatureAvg, humidityAvg, windSpeedAvg, windDirectionAvg);
+
             % Mostrar info abajo en la interfaz
-            set(estMetText, 'String', textoClima);
+            set(estMetText, 'String', textoIntClima);
 
             % Eliminar el texto anterior si existe
             if ~isempty(climaTexto) && ishandle(climaTexto)
@@ -267,10 +314,9 @@ function interfaz_Clima
             end
             
         catch
-            if isempty(climaTexto) && ishandle(climaTexto)
+            if ~isempty(climaTexto) && all(ishandle(climaTexto))
                 delete(climaTexto);
                 set(estMetText, 'String', 'Error al leer la API');
-
             end
         end
     end

@@ -1,6 +1,8 @@
-# 🌦️ Interfaz Gráfica de Procesamiento de Imágenes y Visualización Climática
+# Interfaz de Procesamiento de Imágenes y Detección de Objetos en MATLAB
 
-Este proyecto en MATLAB ofrece una interfaz gráfica interactiva para **cargar imágenes**, **procesarlas** mediante diferentes operadores, y **mostrar datos meteorológicos en tiempo real** sobre las imágenes, usando una API pública de estaciones meteorológicas en el nodo de la Universidad de San Buenaventura de Cali, Colombia.
+Este proyecto es una interfaz gráfica desarrollada en MATLAB para el procesamiento y análisis de imágenes, con integración de datos meteorológicos y herramientas avanzadas de segmentación y visualización. 
+🌦️ La interfaz gráfica interactiva permite **cargar imágenes**, **procesarlas** mediante diferentes operadores, y **mostrar datos meteorológicos en tiempo real** sobre las imágenes, usando una API pública de estaciones meteorológicas en el nodo de la Universidad de San Buenaventura de Cali, Colombia.
+La interfaz también permite hacer una **detección de objetos** y eliminarlos, mostrando la detección mediante diferentes formas.
 
 ---
 
@@ -38,6 +40,22 @@ Este proyecto en MATLAB ofrece una interfaz gráfica interactiva para **cargar i
 - **Modo automático**: El sistema ajusta colores y operadores automáticamente con base en la temperatura.
 - **Modo manual**: Permite control total sobre los valores de color y procesamiento.
 
+## Detección de Objetos y Visualización de Contornos
+
+- La interfaz permite detectar y visualizar objetos en la imagen procesada, con varias opciones de visualización para los contornos:
+  - **Detección de objetos** con selección de área mínima.
+  - **Visualización de contornos**: contorno, rectángulo, círculo o todos combinados.
+
+### Parámetros de Detección
+
+- **Área mínima (slider):** Filtra objetos pequeños, ajustando el valor mínimo de área para considerar un objeto válido.
+- **Operación morfológica:** Mejora la segmentación usando operaciones como cierre para eliminar ruido y rellenar huecos.
+- **Forma de visualización:** Selecciona cómo quieres ver los objetos detectados:
+  - **Contorno:** Dibuja el borde de cada objeto.
+  - **Rectángulo:** Dibuja el rectángulo delimitador de cada objeto.
+  - **Círculo:** Dibuja un círculo equivalente al área de cada objeto.
+  - **Todos:** Muestra simultáneamente el contorno, el rectángulo y el círculo de cada objeto.
+  
 ---
 
 ## 🖥️ ¿Cómo usarlo?
@@ -49,6 +67,7 @@ Este proyecto en MATLAB ofrece una interfaz gráfica interactiva para **cargar i
    - Aplicar operadores.
    - Leer datos meteorológicos.
    - Personalizar visualización del texto climático.
+   - Realizar detección de objetos y eliminarlos.
 4. Activa o desactiva el **Modo Manual** para alternar entre ajustes automáticos y personalizados.
 
 ---
